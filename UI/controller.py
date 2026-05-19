@@ -23,16 +23,17 @@ class Controller:
     def handleCreaGrafo(self, e):
         if self._genere is None:
             self._view.txt_result.controls.clear()
-            self._view.txt_result.controls.append(text = "selezionare")
+            self._view.txt_result.controls.append(ft.Text("selezionare"))
             self._view.update_page()
+            return #DA METTERE
 
         self._model.creaGrafo(self._genere)
         self._view.txt_result.controls.clear()
-        self._view.txt_result.controls.append(text="grafo creato correttamente")
-        self._view.txt_result.controls.append(text=f"nodi {self._model.getN()} e archi {self._model.getA()} "
-                                                   f"e maggiore influenza: {self._model.influenza}")
+        self._view.txt_result.controls.append(ft.Text("grafo creato correttamente"))
+        self._view.txt_result.controls.append(ft.Text(f"nodi {self._model.getN()} e archi {self._model.getA()} "
+                                                   f"e maggiore influenza: {self._model.influenza}"))
         for l in self._model.pesoMa():
-            self._view.txt_result.controls.append(text=f"{l}")
+            self._view.txt_result.controls.append(ft.Text(f"{l}"))
         self._view.update_page()
 
     def handleCreaGrafo1(self,e):
