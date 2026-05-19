@@ -8,6 +8,7 @@ class Controller:
         # the model, which implements the logic of the program and holds the data
         self._model = model
         self._genere = None
+        self.artista = None
 
     def fillDDGenre(self):
         self._generi = self._model.getAllGeneri()
@@ -19,6 +20,15 @@ class Controller:
         self._view.update_page()
     def _choice(self, e):
         self._genere = e.control.data
+
+    def fillDDArtist(self):
+        self._view._ddArtist.options.clear()
+        for a in self._model.mappaArtisti.values():
+            self._view._ddArtist.options.append(ft.dropdown.Option(key=a.Name, data=a, on_click= self._choice2))
+        self._view.update_page()
+
+    def _choice2(self, e):
+        self.artista = e.control.data
 
     def handleCreaGrafo(self, e):
         if self._genere is None:
@@ -36,8 +46,34 @@ class Controller:
             self._view.txt_result.controls.append(ft.Text(f"{l}"))
         self._view.update_page()
 
+        self.fillDDArtist()
+        self._view.update_page()
+
     def handleCreaGrafo1(self,e):
         pass
 
     def handleCammino(self,e):
-        pass
+        if self.artista is None:
+            self._view.txt_result.controls.clear()
+            self._view.txt_result.controls.append(ft.Text("Selezionare un artista"))
+            self._view.update_page()
+            return
+
+            # Punto 2b
+        cammino_lungo = self._model.camminoLungo(self.artista)
+        # Punto 2c
+        cammino_crescente = self._model.camminoCrescente(self.artista)
+
+        self._view.txt_result.controls.clear()
+
+        self._view.txt_result.controls.append(ft.Text(f"Cammino più lungo ({len(cammino_lungo)} nodi):"))
+        for nodo in cammino_lungo:
+            self._view.txt_result.controls.append(ft.Text(f"  {nodo.Name}"))
+
+        self._view.txt_result.controls.append(ft.Text(""))  # riga vuota
+
+        self._view.txt_result.controls.append(ft.Text(f"Cammino pesi crescenti ({len(cammino_crescente)} nodi):"))
+        for nodo in cammino_crescente:
+            self._view.txt_result.controls.append(ft.Text(f"  {nodo.Name}"))
+
+        self._view.update_page()

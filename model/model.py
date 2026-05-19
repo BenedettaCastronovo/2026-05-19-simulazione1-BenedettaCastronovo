@@ -10,6 +10,7 @@ class Model:
         self.mappaG = {}
         self._grafo = nx.DiGraph()
         self._artisti = []
+        self.mappaArtisti = {}
 
     def getAllGeneri(self):
         gen = DAO.getAllGen()
@@ -23,9 +24,9 @@ class Model:
         self._grafo.add_nodes_from(self._artisti)
         # Creiamo un set di ID per un controllo istantaneo e sicuro al 100%
         id_artisti_validi = {a.ArtistId for a in self._artisti}
-        mappaArtisti = {a.ArtistId: a for a in self._artisti}
-        archi = DAO.edges(mappaArtisti, genere)
-        pesi = DAO.getAllP(mappaArtisti)  # ← one query instead of N*2
+        self.mappaArtisti = {a.ArtistId: a for a in self._artisti}
+        archi = DAO.edges(self.mappaArtisti, genere)
+        pesi = DAO.getAllP(self.mappaArtisti)  # ← one query instead of N*2
         for a1, a2 in archi:
             # BLINDATURA: Salta l'arco se uno dei due artisti non appartiene al genere selezionato
             if a1.ArtistId not in id_artisti_validi or a2.ArtistId not in id_artisti_validi:
@@ -71,3 +72,40 @@ class Model:
         return lista[:5]
 
     #data = True IMPORTANTE
+
+    def camminoLungo(self, artista):
+        self._best = []
+        self._dfsLungo(artista, [])
+        return self._best
+
+    def _dfsLungo(self, nodo, cammino_corrente):
+        cammino_corrente.append(nodo)
+        if len(cammino_corrente) > len(self._best):
+            self._best = list(cammino_corrente)
+
+        #La condizione terminale è implicita nel ciclo for — la ricorsione si ferma naturalmente quando non ci sono più vicini da esplorare, cioè quando:
+        #il nodo non ha archi uscenti, oppure
+        #tutti i vicini sono già in cammino_corrente
+
+        for _, vicino, data in self._grafo.out_edges(nodo, data=True):
+            if vicino not in cammino_corrente:  # semplice = no cicli
+                self._dfsLungo(vicino, cammino_corrente)
+
+        cammino_corrente.pop()  # backtracking
+
+    def camminoCrescente(self, artista):
+        self._best = []
+        self._dfsCrescente(artista, [], 0)
+        return self._best
+
+    def _dfsCrescente(self, nodo, cammino_corrente, ultimo_peso):
+        cammino_corrente.append(nodo)
+        if len(cammino_corrente) > len(self._best):
+            self._best = list(cammino_corrente)
+
+        for _, vicino, data in self._grafo.out_edges(nodo, data=True):
+            peso = int(data["weight"])
+            if peso > ultimo_peso and vicino not in cammino_corrente:
+                self._dfsCrescente(vicino, cammino_corrente, peso)
+
+        cammino_corrente.pop()  # backtracking
