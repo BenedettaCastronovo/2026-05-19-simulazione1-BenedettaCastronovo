@@ -43,7 +43,7 @@ class Controller:
         self._view.txt_result.controls.append(ft.Text(f"nodi {self._model.getN()} e archi {self._model.getA()} "
                                                    f"e maggiore influenza: {self._model.influenza}"))
         for l in self._model.pesoMa():
-            self._view.txt_result.controls.append(ft.Text(f"{l}"))
+            self._view.txt_result.controls.append(ft.Text(f"{l[0]} -> {l[1]} con peso {l[2]["weight"]}"))
         self._view.update_page()
 
         self.fillDDArtist()
@@ -60,15 +60,15 @@ class Controller:
             return
 
             # Punto 2b
-        cammino_lungo = self._model.camminoLungo(self.artista)
+        # = self._model.camminoLungo(self.artista)
         # Punto 2c
         cammino_crescente = self._model.camminoCrescente(self.artista)
 
         self._view.txt_result.controls.clear()
 
-        self._view.txt_result.controls.append(ft.Text(f"Cammino più lungo ({len(cammino_lungo)} nodi):"))
-        for nodo in cammino_lungo:
-            self._view.txt_result.controls.append(ft.Text(f"  {nodo.Name}"))
+        #self._view.txt_result.controls.append(ft.Text(f"Cammino più lungo ({len(cammino_lungo)} nodi):"))
+        #for nodo in cammino_lungo:
+         #   self._view.txt_result.controls.append(ft.Text(f"  {nodo.Name}"))
 
         self._view.txt_result.controls.append(ft.Text(""))  # riga vuota
 

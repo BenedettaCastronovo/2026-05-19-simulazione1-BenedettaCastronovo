@@ -60,15 +60,17 @@ class DAO():
         return archi
 
     @staticmethod
-    def getAllP(mappa):
+    def getAllP(mappa, genere):
         cnx = DBConnect.get_connection()
         cursor = cnx.cursor(dictionary=True)
         try:
             query = """select a.ArtistId, sum(il.quantity) as q
-                        from invoiceline il, track t, album a
+                        from invoiceline il, track t, album a, genre g
                         where il.TrackId = t.trackId and t.AlbumId = a.AlbumId
+                        and g.GenreId = t.GenreId 
+                        and g.Name  = %s
                         group by a.ArtistId"""
-            cursor.execute(query)
+            cursor.execute(query, (genere.Name,))
             result = {}
             for row in cursor:
                 if row["ArtistId"] in mappa:

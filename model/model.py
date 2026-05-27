@@ -1,3 +1,4 @@
+import copy
 from operator import itemgetter
 
 import networkx as nx
@@ -26,7 +27,7 @@ class Model:
         id_artisti_validi = {a.ArtistId for a in self._artisti}
         self.mappaArtisti = {a.ArtistId: a for a in self._artisti}
         archi = DAO.edges(self.mappaArtisti, genere)
-        pesi = DAO.getAllP(self.mappaArtisti)  # ← one query instead of N*2
+        pesi = DAO.getAllP(self.mappaArtisti, genere)  # ← one query instead of N*2
         for a1, a2 in archi:
             # BLINDATURA: Salta l'arco se uno dei due artisti non appartiene al genere selezionato
             if a1.ArtistId not in id_artisti_validi or a2.ArtistId not in id_artisti_validi:
@@ -73,12 +74,12 @@ class Model:
 
     #data = True IMPORTANTE
 
-    def camminoLungo(self, artista):
+    #def camminoLungo(self, artista):
         self._best = []
         self._dfsLungo(artista, [])
         return self._best
 
-    def _dfsLungo(self, nodo, cammino_corrente):
+    #def _dfsLungo(self, nodo, cammino_corrente):
         cammino_corrente.append(nodo)
         if len(cammino_corrente) > len(self._best):
             self._best = list(cammino_corrente)
@@ -93,12 +94,12 @@ class Model:
 
         cammino_corrente.pop()  # backtracking
 
-    def camminoCrescente(self, artista):
+    #def camminoCrescente(self, artista):
         self._best = []
         self._dfsCrescente(artista, [], 0)
         return self._best
 
-    def _dfsCrescente(self, nodo, cammino_corrente, ultimo_peso):
+    #def _dfsCrescente(self, nodo, cammino_corrente, ultimo_peso):
         cammino_corrente.append(nodo)
         if len(cammino_corrente) > len(self._best):
             self._best = list(cammino_corrente)
@@ -109,3 +110,22 @@ class Model:
                 self._dfsCrescente(vicino, cammino_corrente, peso)
 
         cammino_corrente.pop()  # backtracking
+
+    def camminoCrescente(self, artista):
+        self._best = []
+        parziale = [artista]
+        for n in self._grafo.successors(parziale[-1]):
+            parziale.append(n)
+            self._dfsCrescente(parziale)
+            parziale.pop()
+        return self._best
+
+    def _dfsCrescente(self, parziale):
+        if len(parziale) > len(self._best):
+            self._best = copy.deepcopy(parziale)
+
+        for n in self._grafo.successors(parziale[-1]):
+            if self._grafo[parziale[-2]][parziale[-1]]["weight"] < self._grafo[parziale[-1]][n]["weight"] and n not in parziale:
+                parziale.append(n)
+                self._dfsCrescente(parziale)
+                parziale.pop()

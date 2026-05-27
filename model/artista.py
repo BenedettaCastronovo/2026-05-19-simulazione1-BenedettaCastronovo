@@ -12,4 +12,4 @@ class Artista:
         return self.ArtistId == other.ArtistId
 
     def __str__(self):
-        return str(self.ArtistId)
+        return str(self.Name)
