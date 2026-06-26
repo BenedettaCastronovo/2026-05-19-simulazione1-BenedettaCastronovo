@@ -18,6 +18,7 @@ class Controller:
                                                     ), self._generi))
         self._view._ddGenre.options = gen
         self._view.update_page()
+
     def _choice(self, e):
         self._genere = e.control.data
 

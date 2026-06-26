@@ -111,6 +111,22 @@ class Model:
 
         cammino_corrente.pop()  # backtracking
 
+    def camminoLungo(self, artista):
+        self._best = []
+        parziale = [artista]
+        self._dfsLungo(parziale)
+        return self._best
+
+    def _dfsLungo(self, parziale):
+        if len(parziale) > len(self._best):
+            self._best = copy.deepcopy(parziale)
+
+        for n in self._grafo.successors(parziale[-1]):
+            if n not in parziale:
+                parziale.append(n)
+                self._dfsLungo(parziale)
+                parziale.pop()
+
     def camminoCrescente(self, artista):
         self._best = []
         parziale = [artista]
