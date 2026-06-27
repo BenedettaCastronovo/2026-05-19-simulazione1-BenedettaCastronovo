@@ -26,9 +26,9 @@ class Model:
         for u, v in self._archi:
             up = self._pop[u]
             vp = self._pop[v]
-            if up > vp:
+            if up < vp:
                 self._grafo.add_edge(self.mappaArtisti[u], self.mappaArtisti[v], weight = up + vp)
-            elif up < vp:
+            elif up > vp:
                 self._grafo.add_edge(self.mappaArtisti[v], self.mappaArtisti[u], weight = up + vp)
             else:
                 self._grafo.add_edge(self.mappaArtisti[u], self.mappaArtisti[v], weight = up + vp)
